@@ -1,18 +1,17 @@
-# emlang — educational "emergent" codec
+# emlang — educational "emergent" codec (v1.1, single-file)
 
-**Purpose:** demonstrate how text can be stylized into a “neural network language.”  
-This is **not cryptography** and **not protection**: the goal is experimentation and visualization.
+**emlang.py** transforms plain text into an *emergent-looking* protocol and can try to decode it back using the same codebook.  
+> ⚠️ This is **not** cryptography or protection; it’s an art/edu demo.
 
-## Features
-- `build`: generate a codebook (by word frequency) from your corpus.  
-- `encode`: transform text into an “emergent” stream of glyphs and symbols.  
-- `decode`: attempt to restore the original text (works best if words are in the codebook).  
-  Unknown words are encoded reversibly through glyphs.
+## What’s new in v1.1
+- All comments, messages, and CLI help in **English**.
+- **Interactive mode (default):** run `python emlang.py` and choose:
+  1) **build** — paste a corpus → save `codebook.json`
+  2) **encode** — paste text or choose a file → emergent output
+  3) **decode** — paste emergent text or choose a file → plain text
+- **Legacy CLI** remains fully supported (build/encode/decode subcommands).
 
-## Installation
-Just download `emlang.py` or the example archive.
-
-## Quick start
+## Quick start (CLI, legacy style)
 ```bash
 # 1) Build a codebook from your corpus
 python emlang.py build codebook.json sample.txt --vocab 200 --seed 42
@@ -24,11 +23,17 @@ python emlang.py encode codebook.json --infile sample.txt --outfile sample.em --
 python emlang.py decode codebook.json --infile sample.em --outfile sample.dec.txt
 ```
 
-## How it works (in short)
-- Text is tokenized into words/punctuation.  
-- The most frequent words in the corpus are assigned “emergent” tokens (Greek letters + symbols + numbers).  
-- Unknown words are encoded via hex→glyph mapping and wrapped in `⟦...⟧`, which allows byte-level recovery.  
-- Additional structural markers (`::`, `∴`, `⇔`) are inserted to give an “alien protocol” feel.
+## interactive IO
+```bash
+python emlang.py
+# choose 1) build, 2) encode, or 3) decode
+# paste text or specify files when prompted
+```
+
+## How it works
+- Frequent words from your corpus get deterministic “emergent” tokens (Greek letters + symbols + numeric suffix).
+- Unknown words are encoded reversibly via hex→glyph blocks like ⟦…⟧.
+- Optional structure markers (::, ∴, ⇔) add “protocol” vibes.
 
 ## Limitations
 - Case restoration and exact punctuation may be imperfect.  
