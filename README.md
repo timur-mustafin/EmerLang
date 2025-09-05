@@ -1,31 +1,32 @@
-# emlang — educational "emergent" codec (v1.1, single-file)
+# emer-lang — educational "emergent" codec (v1.1, single-file)
 
-**emlang.py** transforms plain text into an *emergent-looking* protocol and can try to decode it back using the same codebook.  
+**emer_lang.py** transforms plain text into an *emergent-looking* protocol and can try to decode it back using the same codebook.  
 > ⚠️ This is **not** cryptography or protection; it’s an art/edu demo.
 
 ## What’s new in v1.1
 - All comments, messages, and CLI help in **English**.
-- **Interactive mode (default):** run `python emlang.py` and choose:
+- **Interactive mode (default):** run `python emer_lang.py` and choose:
   1) **build** — paste a corpus → save `codebook.json`
-  2) **encode** — paste text or choose a file → emergent output
-  3) **decode** — paste emergent text or choose a file → plain text
-- **Legacy CLI** remains fully supported (build/encode/decode subcommands).
+  2) **encode** — paste text or choose file → save `.em`
+  3) **decode** — revert `.em` to text
+- Still works with CLI args for scripting
 
-## Quick start (CLI, legacy style)
+## Usage examples
 ```bash
 # 1) Build a codebook from your corpus
-python emlang.py build codebook.json sample.txt --vocab 200 --seed 42
+python emer_lang.py build codebook.json examples/sample.txt --vocab 100 --seed 42
 
-# 2) Encode any text (here: sample.txt)
-python emlang.py encode codebook.json --infile sample.txt --outfile sample.em --structure 0.3 --seed 42
+# 2) Encode text file
+python emer_lang.py encode codebook.json --infile examples/sample.txt --outfile out.em --structure 0.2 --seed 42
 
-# 3) Try to decode it back
-python emlang.py decode codebook.json --infile sample.em --outfile sample.dec.txt
+# 3) Decode back
+python emer_lang.py decode codebook.json --infile out.em --outfile roundtrip.txt
+
 ```
 
 ## interactive IO
 ```bash
-python emlang.py
+python emer_lang.py
 # choose 1) build, 2) encode, or 3) decode
 # paste text or specify files when prompted
 ```
