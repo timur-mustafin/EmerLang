@@ -9,7 +9,7 @@ roundtrip.txt
 out.em
 
 # Local sample corpus
-examples/corpora/mini_en.txt
+#examples/corpora/mini_en.txt
 
 # VSCode
 .vscode/

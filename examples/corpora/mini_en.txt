@@ -1,0 +1,1 @@
+This is a small English sample used to build a codebook and test the codec.
