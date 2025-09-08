@@ -5,6 +5,7 @@ __pycache__/
 
 # Build artifacts
 *.em
+*.txt
 roundtrip.txt
 out.em
 
