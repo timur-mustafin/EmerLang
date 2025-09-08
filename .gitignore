@@ -3,15 +3,6 @@ venv/
 __pycache__/
 *.pyc
 
-# Django
-*.sqlite3
-*.log
-*.pot
-*.py[cod]
-*.swp
-db.sqlite3
-media/
-
 # .em & txt
 *.em
 roundtrip.txt
@@ -22,7 +13,3 @@ roundtrip.txt
 
 # Env
 .env
-
-# Node
-node_modules/
-dist/
