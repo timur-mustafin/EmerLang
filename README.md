@@ -28,6 +28,11 @@ emlang interactive
 # choose 1/2/3 and paste text
 ```
 
+## GUI with demo
+```bash
+python -m emlang.gui.emerlang_gui
+```
+
 ## Python API
 ```python
 from emlang import Codebook, encode, decode

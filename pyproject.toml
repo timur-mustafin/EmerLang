@@ -20,3 +20,4 @@ Repository = "https://github.com/YOUR-USER/emlang"
 [project.scripts]
 emlang = "emlang.cli:app"
 emlang-interactive = "emlang.interactive:main"
+emlang-gui = "emlang.gui.emerlang_gui:main"
