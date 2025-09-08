@@ -13,7 +13,8 @@ db.sqlite3
 media/
 
 # .em & txt
-.em
+*.em
+roundtrip.txt
 *.txt
 
 # VSCode
