@@ -1,9 +1,8 @@
 import re
-from .utils import smart_join, crc8
 from .tokenize import tokenize_basic
+from .utils import smart_join, crc8
 
 GLYPH_BLOCK_RE = re.compile(r"⟦([^\]~]+)~([0-9a-fA-F]{2})⟧")
-
 _EMERG_OPS = "ΔΨΩΛΣΦΘΞζδπµ∑∴⊕⊗⊡⟦⟧⟨⟩⇔⇒⇐↔→←∵≈≡∝∞∇"
 EMERG_TOKEN_RE = re.compile(r"([Α-Ωα-ω])([" + _EMERG_OPS + r"α-ω]?)(\d{1,2})")
 

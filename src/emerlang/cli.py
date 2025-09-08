@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 import typer
 
-# --- Console: best-effort UTF-8 for Windows consoles (prevents cp1252 issues) ---
+# Best-effort UTF-8 on Windows
 try:
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     sys.stdin.reconfigure(encoding="utf-8", errors="replace")
@@ -15,7 +15,6 @@ from .decoder import decode as decode_core
 
 app = typer.Typer(no_args_is_help=False, help="EmerLang — emergent-looking codec. Not crypto.")
 
-# --- Robust text reader: auto-detect common BOMs and encodings ---
 def _read_text_any(path: str) -> str:
     data = Path(path).read_bytes()
     for enc in ("utf-8", "utf-8-sig", "utf-16-le", "utf-16-be"):
@@ -23,7 +22,6 @@ def _read_text_any(path: str) -> str:
             return data.decode(enc)
         except Exception:
             continue
-    # Fallback: replace undecodable bytes
     return data.decode("utf-8", errors="replace")
 
 @app.command()
@@ -42,22 +40,17 @@ def encode(codebook_path: str = typer.Argument(..., help="Path to codebook.json"
            structure: float = typer.Option(0.2, "--structure", min=0.0, max=1.0),
            seed: int = typer.Option(42, "--seed")):
     cb = Codebook.load(codebook_path)
-
-    # Input: file > piped stdin > interactive prompt
     if infile:
         text = _read_text_any(infile)
     elif not sys.stdin.isatty():
         text = sys.stdin.read()
     else:
         text = typer.prompt("Paste text")
-
     emergent = encode_core(text, cb, structure=structure, seed=seed)
-
     if outfile:
         Path(outfile).write_text(emergent, encoding="utf-8")
         typer.echo(f"[OK] Encoded → {outfile}")
     else:
-        # Use print to bypass click/cp1252 encoding edge cases
         print(emergent)
 
 @app.command()
@@ -65,17 +58,13 @@ def decode(codebook_path: str = typer.Argument(..., help="Path to codebook.json"
            infile: str = typer.Option(None, "--in", "--infile", help="Input emergent (file). If omitted, reads from stdin."),
            outfile: str = typer.Option(None, "--out", "--outfile", help="Output plain text file. If omitted, prints to stdout.")):
     cb = Codebook.load(codebook_path)
-
-    # Input: file > piped stdin > interactive prompt
     if infile:
         emergent = _read_text_any(infile)
     elif not sys.stdin.isatty():
         emergent = sys.stdin.read()
     else:
         emergent = typer.prompt("Paste emergent text")
-
     plain = decode_core(emergent, cb)
-
     if outfile:
         Path(outfile).write_text(plain, encoding="utf-8")
         typer.echo(f"[OK] Decoded → {outfile}")
@@ -84,9 +73,6 @@ def decode(codebook_path: str = typer.Argument(..., help="Path to codebook.json"
 
 @app.command()
 def interactive():
-    """
-    Interactive mini-menu (build/encode/decode), useful for trying the codec quickly.
-    """
     typer.echo("🛰️ EmerLang interactive — not crypto; art/edu demo.\n")
     typer.echo("Choose: [1] build  [2] encode  [3] decode  [q] quit")
     while True:

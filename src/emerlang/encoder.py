@@ -1,5 +1,5 @@
 from typing import List
-import re, random
+import random
 from .tokenize import tokenize_basic, is_word, normalize
 from .utils import crc8, smart_join
 

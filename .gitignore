@@ -2,21 +2,20 @@
 venv/
 __pycache__/
 *.pyc
-*.egg-info/
+
+# Build/dist
 dist/
 build/
+*.egg-info/
 
-# Build artifacts
+# Generated artifacts
 *.em
-*.txt
-roundtrip.txt
 out.em
+roundtrip.txt
 
-# Local sample corpus
-!examples/corpora/mini_en.txt
-
-# VSCode
+# IDE
 .vscode/
+.idea/
 
 # Environment
 .env

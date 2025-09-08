@@ -3,11 +3,12 @@ import json, random, time
 from dataclasses import dataclass, field
 from typing import Dict
 from collections import Counter
+from pathlib import Path
 from .tokenize import tokenize_basic, is_word
 
 GREEK_LOWER = list("αβγδεζηθικλμνξοπρστυφχψω")
 GREEK_UPPER = list("ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ")
-OPS = ["Δ","Ψ","Ω","Λ","Σ","Φ","Θ","Ξ","ζ","δ","π","µ","∑","∴","⊕","⊗","⊡","⟦","⟧","⟨","⟩","⇔","⇒","⇐","↔","→","←","∵","≈","≡","∝","∞","∇"]
+OPS = ["Δ","Ψ","Ω","Λ","Σ","Φ","Θ","Ξ","ζ","δ","π","µ","∑","∴","⊕","⊗","⊡","⇔","⇒","⇐","↔","→","←","∵","≈","≡","∝","∞","∇"]
 RESERVED = set(["⟦","⟧","⟨","⟩","::","∴"])
 
 HEX_DIGIT_TO_GLYPH = {
@@ -15,6 +16,15 @@ HEX_DIGIT_TO_GLYPH = {
     "8":"ι","9":"κ","a":"λ","b":"μ","c":"ν","d":"ξ","e":"ο","f":"π",
 }
 GLYPH_TO_HEX = {v:k for k,v in HEX_DIGIT_TO_GLYPH.items()}
+
+def _read_text_any(path: str) -> str:
+    data = Path(path).read_bytes()
+    for enc in ("utf-8","utf-8-sig","utf-16-le","utf-16-be"):
+        try:
+            return data.decode(enc)
+        except Exception:
+            pass
+    return data.decode("utf-8", errors="replace")
 
 def _token_factory(seed: int = 1337):
     rnd = random.Random(seed)
@@ -45,10 +55,9 @@ class Codebook:
 
     @classmethod
     def train(cls, corpus_path: str, vocab_size: int = 500, seed: int = 42, tokenizer: str = "basic", ngram_max: int = 1):
-        text = open(corpus_path, "r", encoding="utf-8").read()
+        text = _read_text_any(corpus_path)
         toks = tokenize_basic(text)
         words = [t.lower() for t in toks if is_word(t)]
-        from collections import Counter
         freq = Counter(words)
         most_common = [w for w,_ in freq.most_common(vocab_size)]
         make_token = _token_factory(seed)

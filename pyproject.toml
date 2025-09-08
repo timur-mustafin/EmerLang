@@ -3,21 +3,26 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "emlang"
-version = "3.0.2"
-description = "EmerLang — emergent-looking codec (unified): CLI + interactive mode. Not crypto."
+name = "emerlang"
+version = "3.2.0"
+description = "EmerLang — emergent-looking codec with CLI and PySide6 GUI. Not cryptography."
 readme = "README.md"
 authors = [{name = "Your Name"}]
 license = {text = "MIT"}
 requires-python = ">=3.9"
-dependencies = ["typer>=0.12.3"]
+dependencies = [
+  "typer>=0.12.3",
+  "PySide6>=6.6"
+]
 keywords = ["art", "codec", "emergent language", "toy", "education"]
 
 [project.urls]
-Homepage = "https://github.com/YOUR-USER/emlang"
-Repository = "https://github.com/YOUR-USER/emlang"
+Homepage = "https://github.com/YOUR-USER/emerlang"
+Repository = "https://github.com/YOUR-USER/emerlang"
 
 [project.scripts]
-emlang = "emlang.cli:app"
-emlang-interactive = "emlang.interactive:main"
-emlang-gui = "emlang.gui.emerlang_gui:main"
+emerlang = "emerlang.cli:app"
+emerlang-gui = "emerlang.gui.emerlang_gui:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

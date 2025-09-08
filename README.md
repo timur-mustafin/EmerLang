@@ -1,45 +1,45 @@
-# 🛰️ EmerLang (unified v3) — emergent-looking codec
+# 🛰️ EmerLang (emerlang)
 
-**Not cryptography.** Educational art-tool that makes text look like an alien protocol.
+**Not cryptography.** Educational art-tool that turns text into an “emergent-looking” protocol.
 
-## What’s unified
-- v1 single-file style **interactive mode** (now via `emlang interactive`).
-- v2 package with **CLI** (`emlang build|encode|decode`), clean API.
-- Stdin/Stdout friendly encode/decode; **checksum** in fallback blocks `⟦…~cc⟧`; improved spacing.
-
-## Quickstart (CLI)
+## Install (dev)
 ```bash
 python -m venv venv
+# Windows
+.\venv\Scripts\activate
+# macOS/Linux
+source venv/bin/activate
+
 pip install -e .
-emlang build codebook.json  examples/corpora/mini_en.txt --vocab 300 --seed 42
-emlang encode codebook.json --in examples/corpora/mini_en.txt --out out.em --structure 0.2
-emlang decode codebook.json --in out.em --out roundtrip.txt
 ```
 
-### Stdin/Stdout
+## CLI
 ```bash
-echo "Hello emergent world" | emlang encode codebook.json > out.em
-type out.em | emlang decode codebook.json   # Windows
+# 1) Build a codebook
+emerlang build codebook.json examples/corpora/mini_en.txt --vocab 300 --seed 42
+
+# 2) Encode
+emerlang encode codebook.json --in examples/corpora/mini_en.txt --out out.em --structure 0.2
+
+# 3) Decode
+emerlang decode codebook.json --in out.em --out roundtrip.txt
 ```
 
-## Interactive (v1-style)
+Stdin/Stdout (Windows-safe if your console is UTF-8):
+```powershell
+'Hello' | emerlang encode codebook.json > out.em
+Get-Content out.em -Raw | emerlang decode codebook.json > roundtrip.txt
+```
+
+## GUI
 ```bash
-emlang interactive
-# choose 1/2/3 and paste text
+emerlang-gui
+# or:
+python -m emerlang.gui.emerlang_gui
 ```
+**Demo tab** animates two encoded messages on the top row (A/B) and reveals their decoded forms on the bottom row after ~2s. The output reflects the actual codebook & structure/seed you choose.
 
-## GUI with demo
-```bash
-python -m emlang.gui.emerlang_gui
-```
-
-## Python API
-```python
-from emlang import Codebook, encode, decode
-cb = Codebook.train("examples/corpora/mini_en.txt", vocab_size=300, seed=42)
-em = encode("Hello world!", cb, structure=0.2, seed=42)
-print(decode(em, cb))
-```
-
-## Security notice
-Not encryption / not obfuscation. For real security use vetted cryptography.
+## Notes
+- Input file decoding is tolerant (UTF-8 / UTF-8 BOM / UTF-16 LE/BE).
+- Decoder understands both glyph blocks (⟦…~cc⟧) and Greek+digits tokens (e.g., Πε13).
+- This is an art/education demo, **not** secure encryption.

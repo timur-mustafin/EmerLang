@@ -1,6 +1,7 @@
 import re, unicodedata
 from typing import List
 
+# Words, numbers, or standalone punctuation
 WORD_RE = re.compile(r"[^\W\d_]+(?:['’\-][^\W\d_]+)*|[0-9]+|[^\w\s]", re.UNICODE)
 
 def normalize(text: str, form: str = "NFKC") -> str:
