@@ -11,12 +11,16 @@ from emerlang.decoder import decode as em_decode
 
 ENCODINGS = ("utf-8", "utf-8-sig", "utf-16-le", "utf-16-be")
 
+
 def read_text_any(path: str) -> str:
     b = Path(path).read_bytes()
     for enc in ENCODINGS:
-        try: return b.decode(enc)
-        except Exception: pass
+        try:
+            return b.decode(enc)
+        except Exception:
+            pass
     return b.decode("utf-8", errors="replace")
+
 
 # ----------------------------- Build Tab -----------------------------
 class BuildTab(QtWidgets.QWidget):
@@ -27,6 +31,18 @@ class BuildTab(QtWidgets.QWidget):
         self._init_ui()
         self._wire()
 
+        # Default the corpus to examples\\corpora\\mini_en.txt (project root if possible)
+        # Falls back gracefully if not found.
+        try:
+            # when running from source tree: .../src/emerlang/gui/emerlang_gui.py
+            proj_root = Path(__file__).resolve().parents[3]
+            default_corpus = proj_root / "examples" / "corpora" / "mini_en.txt"
+        except Exception:
+            default_corpus = Path("examples") / "corpora" / "mini_en.txt"
+
+        if default_corpus.exists():
+            self.corpusPath.setText(str(default_corpus))
+
     def _init_ui(self):
         self.corpusPath = QtWidgets.QLineEdit()
         self.corpusBrowse = QtWidgets.QPushButton("Browse…")
@@ -34,7 +50,16 @@ class BuildTab(QtWidgets.QWidget):
         self.outputBrowse = QtWidgets.QPushButton("Save As…")
         self.vocab = QtWidgets.QSpinBox(); self.vocab.setRange(50, 10000); self.vocab.setValue(300)
         self.seed = QtWidgets.QSpinBox(); self.seed.setRange(0, 2**31-1); self.seed.setValue(42)
-        self.buildBtn = QtWidgets.QPushButton("Build codebook"); self.buildBtn.setEnabled(False)
+
+        # Build button (green with white text)
+        self.buildBtn = QtWidgets.QPushButton("Build codebook")
+        self.buildBtn.setEnabled(False)
+        self.buildBtn.setStyleSheet(
+            "QPushButton { background-color: #16a34a; color: white; font-weight: 600; padding: 6px 12px; border-radius: 6px; }"
+            "QPushButton:disabled { background-color: #9ca3af; color: white; }"
+            "QPushButton:hover:!disabled { background-color: #15803d; }"
+        )
+
         self.analyzeBtn = QtWidgets.QPushButton("Analyze")
 
         self.preview = QtWidgets.QPlainTextEdit(); self.preview.setReadOnly(True); self.preview.setPlaceholderText("Corpus preview…")
@@ -107,7 +132,7 @@ class BuildTab(QtWidgets.QWidget):
         try:
             text = read_text_any(self.corpusPath.text())
             import re, collections
-            WORD_RE = re.compile(r"[^\W\d_]+(?:['’\-][^\W\d_]+)*|[0-9]+", re.UNICODE)
+            WORD_RE = re.compile(r"[^\W\d_]+(?:['’\\-][^\W\d_]+)*|[0-9]+", re.UNICODE)
             toks = WORD_RE.findall(text)
             words = [t.lower() for t in toks]
             freq = collections.Counter(words)
@@ -144,6 +169,7 @@ class BuildTab(QtWidgets.QWidget):
             self.progress.hide()
             self.status.setText(f"Build failed: {e}")
 
+
 # ----------------------------- Encode Tab -----------------------------
 class EncodeTab(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -163,7 +189,13 @@ class EncodeTab(QtWidgets.QWidget):
 
         self.textIn = QtWidgets.QPlainTextEdit(); self.textIn.setPlaceholderText("Input text (or choose a file above)…")
         self.textOut = QtWidgets.QPlainTextEdit(); self.textOut.setPlaceholderText("Encoded output…"); self.textOut.setReadOnly(True)
+
+        # Encode button (blue with white text)
         self.runBtn = QtWidgets.QPushButton("Encode")
+        self.runBtn.setStyleSheet(
+            "QPushButton { background-color: #2563eb; color: white; font-weight: 600; padding: 6px 12px; border-radius: 6px; }"
+            "QPushButton:hover { background-color: #1d4ed8; }"
+        )
 
         grid = QtWidgets.QGridLayout()
         grid.addWidget(QtWidgets.QLabel("Codebook"), 0, 0); grid.addWidget(self.codebookPath, 0, 1); grid.addWidget(self.codebookBrowse, 0, 2)
@@ -221,6 +253,7 @@ class EncodeTab(QtWidgets.QWidget):
             except Exception as e:
                 QtWidgets.QMessageBox.warning(self, "Error", f"Failed to save output: {e}")
 
+
 # ----------------------------- Decode Tab -----------------------------
 class DecodeTab(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -237,22 +270,29 @@ class DecodeTab(QtWidgets.QWidget):
 
         self.textIn = QtWidgets.QPlainTextEdit(); self.textIn.setPlaceholderText("Emergent text (or choose a file above)…")
         self.textOut = QtWidgets.QPlainTextEdit(); self.textOut.setPlaceholderText("Decoded output…"); self.textOut.setReadOnly(True)
+
+        # Decode button (blue with white text) — placed right after Output file row
         self.runBtn = QtWidgets.QPushButton("Decode")
+        self.runBtn.setStyleSheet(
+            "QPushButton { background-color: #2563eb; color: white; font-weight: 600; padding: 6px 12px; border-radius: 6px; }"
+            "QPushButton:hover { background-color: #1d4ed8; }"
+        )
 
         grid = QtWidgets.QGridLayout()
         grid.addWidget(QtWidgets.QLabel("Codebook"), 0, 0); grid.addWidget(self.codebookPath, 0, 1); grid.addWidget(self.codebookBrowse, 0, 2)
         grid.addWidget(QtWidgets.QLabel("Input file"), 1, 0); grid.addWidget(self.inFile, 1, 1); grid.addWidget(self.inBrowse, 1, 2)
         grid.addWidget(QtWidgets.QLabel("Output file"), 2, 0); grid.addWidget(self.outFile, 2, 1); grid.addWidget(self.outBrowse, 2, 2)
 
+        # Button row inserted here (before emergent input area)
+        row_btn = QtWidgets.QHBoxLayout(); row_btn.addStretch(1); row_btn.addWidget(self.runBtn)
+
         split = QtWidgets.QSplitter(); split.setOrientation(QtCore.Qt.Vertical)
         w1 = QtWidgets.QWidget(); l1 = QtWidgets.QVBoxLayout(w1); l1.addWidget(QtWidgets.QLabel("Emergent input")); l1.addWidget(self.textIn)
         w2 = QtWidgets.QWidget(); l2 = QtWidgets.QVBoxLayout(w2); l2.addWidget(QtWidgets.QLabel("Decoded")); l2.addWidget(self.textOut)
         split.addWidget(w1); split.addWidget(w2)
 
-        row = QtWidgets.QHBoxLayout(); row.addStretch(1); row.addWidget(self.runBtn)
-
         v = QtWidgets.QVBoxLayout(self)
-        v.addLayout(grid); v.addWidget(split, 1); v.addLayout(row)
+        v.addLayout(grid); v.addLayout(row_btn); v.addWidget(split, 1)
 
     def _wire(self):
         self.codebookBrowse.clicked.connect(lambda: self._pick(self.codebookPath, "JSON (*.json)"))
@@ -292,6 +332,7 @@ class DecodeTab(QtWidgets.QWidget):
             except Exception as e:
                 QtWidgets.QMessageBox.warning(self, "Error", f"Failed to save output: {e}")
 
+
 # ----------------------------- Demo Tab -----------------------------
 @dataclass
 class DemoConfig:
@@ -299,8 +340,9 @@ class DemoConfig:
     b_text: str = "ckpt v0.44 opt=adam"
     structure: float = 0.2
     seed: int = 42
-    after_delay_ms: int = 800
+    after_delay_ms: int = 2200
     type_speed_ms: int = 15
+
 
 class Typewriter(QtCore.QObject):
     finished = QtCore.Signal()
@@ -316,6 +358,7 @@ class Typewriter(QtCore.QObject):
         self._target.moveCursor(QtGui.QTextCursor.End)
         self._target.insertPlainText(self._text[self._i]); self._i += 1
 
+
 class DemoTab(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -328,6 +371,11 @@ class DemoTab(QtWidgets.QWidget):
         self.structLabel = QtWidgets.QLabel(f"Structure: {self.cfg.structure:.2f}")
         self.seedSpin = QtWidgets.QSpinBox(); self.seedSpin.setRange(0, 2**31-1); self.seedSpin.setValue(self.cfg.seed)
         self.runBtn = QtWidgets.QPushButton("Run demo"); self.runBtn.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_MediaPlay))
+        self.runBtn.setStyleSheet(
+            "QPushButton { background-color: #16a34a; color: white; font-weight: 600; padding: 6px 12px; border-radius: 6px; }"
+            "QPushButton:disabled { background-color: #9ca3af; color: white; }"
+            "QPushButton:hover:!disabled { background-color: #15803d; }"
+        )
 
         self.aEdit = QtWidgets.QLineEdit(self.cfg.a_text)
         self.bEdit = QtWidgets.QLineEdit(self.cfg.b_text)
@@ -404,12 +452,23 @@ class DemoTab(QtWidgets.QWidget):
         a_plain = em_decode(a_em, cb); b_plain = em_decode(b_em, cb)
         self.A_dec.setPlainText(a_plain); self.B_dec.setPlainText(b_plain)
 
+
 # ----------------------------- Main Window -----------------------------
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("EmerLang GUI")
-        self.resize(1100, 760)
+        self.resize(800, 600)
+
+        # Try to load packaged icon from src/emerlang/assets/app.png; ignore if missing
+        try:
+            from importlib import resources
+            res = resources.files("emerlang").joinpath("assets/app.png")
+            if res and res.is_file():
+                with resources.as_file(res) as p:
+                    self.setWindowIcon(QtGui.QIcon(str(p)))
+        except Exception:
+            pass  # fall back to default Qt icon
 
         tabs = QtWidgets.QTabWidget()
         self.buildTab = BuildTab()
@@ -431,11 +490,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.decodeTab.codebookPath.setText(cb_path)
         self.demoTab.codebookEdit.setText(cb_path)
 
+
 def main():
     app = QtWidgets.QApplication([])
     w = MainWindow()
     w.show()
     app.exec()
+
 
 if __name__ == "__main__":
     main()
