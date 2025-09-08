@@ -12,6 +12,10 @@ __pycache__/
 db.sqlite3
 media/
 
+# .em & txt
+.em
+*.txt
+
 # VSCode
 .vscode/
 

@@ -9,6 +9,7 @@
 
 ## Quickstart (CLI)
 ```bash
+python -m venv venv
 pip install -e .
 emlang build codebook.json  examples/corpora/mini_en.txt --vocab 300 --seed 42
 emlang encode codebook.json --in examples/corpora/mini_en.txt --out out.em --structure 0.2
