@@ -3,13 +3,16 @@ venv/
 __pycache__/
 *.pyc
 
-# .em & txt
+# Build artifacts
 *.em
 roundtrip.txt
-*.txt
+out.em
+
+# Local sample corpus
+examples/corpora/mini_en.txt
 
 # VSCode
 .vscode/
 
-# Env
+# Environment
 .env
