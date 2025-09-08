@@ -1,3 +1,0 @@
-[console_scripts]
-emlang = emlang.cli:app
-emlang-interactive = emlang.interactive:main
